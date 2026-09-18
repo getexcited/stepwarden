@@ -1,0 +1,21 @@
+node_modules/
+
+# No lockfile, deliberately. Claude Code runs `npm ci` on install when it finds
+# a package.json AND a lockfile at the plugin root, which would copy a 23 MB
+# node_modules of dev-only TypeScript into every install of a plugin that has no
+# runtime dependencies at all. package.json stays for the development scripts.
+package-lock.json
+.env
+.DS_Store
+
+# Per-session audit logs written by the plugin at runtime.
+.claude/stepwarden/
+
+# Pre-launch drafts, the publishing checklist and the launch post.
+# Local only — never part of the published plugin.
+not_publish/
+
+# Claude Code's own type declarations, written by /plugin-types. Anthropic's
+# material, not ours to license, and generated per build and per machine
+# (claude-code-mcp.d.ts lists the MCP tools of whoever ran it). Regenerate it.
+.claude/types/

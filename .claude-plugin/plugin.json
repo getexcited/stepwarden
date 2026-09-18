@@ -1,0 +1,111 @@
+{
+  "name": "stepwarden",
+  "version": "0.1.0",
+  "description": "Every tool call your agent makes, checked before it runs. Verifies each pending tool call against the session's plan using TypeSafe AI's Jev model, then allows it, asks you, or blocks it.",
+  "author": {
+    "name": "Stefan Trockel",
+    "url": "https://github.com/getexcited"
+  },
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/getexcited/stepwarden",
+  "repository": "https://github.com/getexcited/stepwarden",
+  "keywords": [
+    "agent-verification",
+    "guardrails",
+    "function-hooks",
+    "jev",
+    "typesafe",
+    "security"
+  ],
+  "userConfig": {
+    "TYPESAFE_API_KEY": {
+      "type": "string",
+      "title": "TypeSafe AI API key",
+      "description": "Get one at https://typesafe.ai. Stored in your OS keychain, never in a file. Leave blank to use the TYPESAFE_API_KEY environment variable instead.",
+      "sensitive": true
+    },
+    "mode": {
+      "type": "string",
+      "title": "Mode",
+      "description": "audit: verify and log every call but never block — the shipped default, so you can calibrate on your own traffic first. enforce: block or ask on risky calls. off: verify nothing. Switch any time with /stepwarden <mode>.",
+      "options": [
+        "enforce",
+        "audit",
+        "off"
+      ],
+      "default": "audit"
+    },
+    "denyAbove": {
+      "type": "number",
+      "title": "Block above",
+      "description": "Block a call outright when any signal's probability reaches this (0-1). Keep it high; Jev is not perfect, and a false block interrupts real work.",
+      "default": 0.9
+    },
+    "flagAbove": {
+      "type": "number",
+      "title": "Ask above",
+      "description": "Ask you to confirm when any signal reaches this (0-1). Must be at or below the block threshold.",
+      "default": 0.6
+    },
+    "lowIntentAtOrBelow": {
+      "type": "number",
+      "title": "Ask below this intent score",
+      "description": "Ask you when the call's consistency with your plan scores at or below this, on a 0-4 scale where 0 contradicts the plan and 4 is fully consistent. Raise it to be asked more often.",
+      "default": 1
+    },
+    "onError": {
+      "type": "string",
+      "title": "If verification fails",
+      "description": "What to do when Jev cannot be reached, times out, or no API key is set. 'allow' keeps you working during an outage; 'deny' fails closed and blocks the call.",
+      "options": [
+        "allow",
+        "deny"
+      ],
+      "default": "allow"
+    },
+    "onNoAnswer": {
+      "type": "string",
+      "title": "If nobody answers",
+      "description": "What to do with a flagged call when you cannot be asked — a non-interactive run, a dismissed dialog, or more than 50 questions already asked this session.",
+      "options": [
+        "allow",
+        "deny"
+      ],
+      "default": "allow"
+    },
+    "skipTools": {
+      "type": "string",
+      "title": "Tools to skip",
+      "description": "Comma-separated tool names never sent for verification. Read-only, high-volume tools belong here: it keeps latency and cost down. Use 'none' to verify everything.",
+      "default": "Read, Glob, Grep, TodoWrite, NotebookRead, ListAgents, TaskOutput"
+    },
+    "model": {
+      "type": "string",
+      "title": "Jev model",
+      "description": "Which TypeSafe model answers the verification questions.",
+      "options": [
+        "jev-latest",
+        "jev-preview"
+      ],
+      "default": "jev-latest"
+    },
+    "timeoutMs": {
+      "type": "number",
+      "title": "Timeout (ms)",
+      "description": "How long to wait for Jev before giving up and applying the 'if verification fails' policy. A verification normally takes well under a second.",
+      "default": 5000
+    },
+    "unhealthyAfter": {
+      "type": "number",
+      "title": "Warn after N failures",
+      "description": "Show a warning once this many verifications have failed in a row, so a silent outage is visible.",
+      "default": 3
+    },
+    "auditLog": {
+      "type": "boolean",
+      "title": "Write an audit log",
+      "description": "Record every decision to .claude/stepwarden/<session>.jsonl so thresholds can be calibrated against real traffic. One file per session. Tool arguments are redacted, but not perfectly.",
+      "default": true
+    }
+  }
+}

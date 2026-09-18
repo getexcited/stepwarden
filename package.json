@@ -1,0 +1,22 @@
+{
+  "name": "stepwarden",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Every Claude Code tool call, checked before it runs, using TypeSafe AI's Jev model.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "types": "echo 'Run /plugin-types inside a Claude Code session to regenerate .claude/types/'",
+    "typecheck": "node -e \"require('fs').existsSync('.claude/types/claude-code.d.ts') || (console.error('.claude/types/ is missing. Run /plugin-types inside a Claude Code session in this checkout first.'), process.exit(1))\" && tsc --noEmit",
+    "validate": "claude plugin validate . --strict",
+    "test": "claude plugin test .",
+    "check": "npm run typecheck && npm run validate && npm run test",
+    "analyze": "node scripts/analyze-audit.mjs"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.0"
+  }
+}
